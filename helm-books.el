@@ -1,7 +1,8 @@
 ;;; helm-books.el --- Books searcher with helm interface
 ;; Author: grugrut <grugruglut+github@gmail.com>
 ;; URL: https://github.com/grugrut/helm-books
-;; Version: 0.1
+;; Version: 0.5
+;; Package-Requires: ((helm "2.0.0"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -34,7 +35,7 @@
   "."
   (switch-to-buffer
    (url-retrieve-synchronously
-    "https://www.googleapis.com/books/v1/volumes?q=Emacs"))
+    (concat "https://www.googleapis.com/books/v1/volumes?q=" helm-pattern)))
   (goto-char (point-min))
   (re-search-forward "\n\n")
   (setq response-string
@@ -45,33 +46,48 @@
 
 (defun helm-books--extract-values (item)
   "."
-  (dolist (i item)
-    (when (string= "volumeInfo" (car i))
-      (dolist (j (cdr i))
-        (when (string= "title" (car j))
-          (setq title (cdr j)))
-        (when (string= "publisher" (car j))
-          (setq publisher (cdr j)))
-        (when (string= "publishedDate" (car j))
-          (setq publishedDate (cdr j)))
-        )))
-  (format "Title:%s, Publisher:%s, PublishedDate:%s" title publisher publishedDate))
+  (let ((title "")
+        (author "")
+        (publisher "")
+        (publishedDate ""))
+    (dolist (i item)
+      (when (string= "volumeInfo" (car i))
+        (dolist (j (cdr i))
+          (when (string= "title" (car j))
+            (setq title (cdr j)))
+          (when (string= "authors" (car j))
+            (setq author (cdr j)))
+          (when (string= "publisher" (car j))
+            (setq publisher (cdr j)))
+          (when (string= "publishedDate" (car j))
+            (setq publishedDate (cdr j)))
+          )))
+    (format "Title:%s, Authors:%s, Publisher:%s, PublishedDate:%s" title author publisher publishedDate)))
 
-(defun helm-books--candidates ()
+(defun helm-books--candidates-from-google ()
   "."
   (mapcar 'helm-books--extract-values (cdr (nth 2 (helm-books--url-retrieve-from-google)))))
 
+(defun helm-books--candidates ()
+  "."
+  (funcall #'helm-books--candidates-from-google))
+
 (defvar helm-books--source
-  (helm-build-sync-source "Books"
-    :candidates #'helm-books--candidates))
+  (helm-build-sync-source  "Books"
+    :candidates #'helm-books--candidates
+    :requires-pattern 1
+    :volatile t
+    :action (helm-make-actions
+             "Insert" #'insert)))
 
 ;;;###autoload
 (defun helm-books ()
   "Books searcher with helm interface."
   (interactive)
-  (helm :sources '(helm-books--source)
-        :prompt "Search books: "
-        :buffer "*helm books*"))
+  (let ((helm-input-idle-delay 0.3))
+    (helm :sources '(helm-books--source)
+          :prompt "Search books: "
+          :buffer "*helm books*")))
 
 (provide 'helm-books)
 
