@@ -2,7 +2,7 @@
 ;; Author: grugrut <grugruglut+github@gmail.com>
 ;; URL: https://github.com/grugrut/helm-books
 ;; Version: 0.5
-;; Package-Requires: ((helm "2.0.0"))
+;; Package-Requires: ((helm "1.7.7"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,6 +30,10 @@
   "Books searcher with helm interface"
   :prefix "helm-books-"
   :group 'helm)
+
+(defcustom helm-books-custom-format "#title#\n:AUTHORS:#author#"
+  "."
+  :group 'helm-books)
 
 (defun helm-books--url-retrieve-from-google ()
   "."
@@ -72,12 +76,28 @@
   "."
   (funcall #'helm-books--candidates-from-google))
 
+(defun helm-books--custom-format-action (candidate)
+  "."
+  (let ((returnString helm-books-custom-format))
+    (insert returnString)
+    (string-match "Title:\\(.+?\\)," candidate)
+    (setq returnString (replace-regexp-in-string "#title#" (match-string 1 candidate) returnString))
+    (string-match "Authors:\\(.+?\\)," candidate)
+    (setq returnString (replace-regexp-in-string "#author#" (match-string 1 candidate) returnString))
+    (string-match "Publisher:\\(.+?\\)," candidate)
+    (setq returnString (replace-regexp-in-string "#publisher#" (match-string 1 candidate) returnString))
+    (string-match "PublishDate:\\(.+?\\)," candidate)
+    (setq returnString (replace-regexp-in-string "#publishDate#" (match-string 1 candidate) returnString))
+    (message returnString)
+    ))
+
 (defvar helm-books--source
   (helm-build-sync-source  "Books"
     :candidates #'helm-books--candidates
     :requires-pattern 1
     :volatile t
     :action (helm-make-actions
+             "Insert custom format" #'helm-books--custom-format-action
              "Insert" #'insert)))
 
 ;;;###autoload
