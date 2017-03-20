@@ -32,7 +32,7 @@
   :group 'helm)
 
 (defcustom helm-books-custom-format "#title#\n:AUTHORS:#author#"
-  "A format of helm-books--custom-format-action.
+  "A format of 'helm-books--custom-format-action'.
 #title#, #author#, #publisher#, #publishDate# are replaced imformation of the book."
   :group 'helm-books)
 
