@@ -14,6 +14,8 @@ You can search books using google books api, and insert with custom format.
 
 ## Installation
 
+Copy helm-books.el to a directory in your `load-path`.
+
 ## Setup
 
 ``` emacs-lisp
