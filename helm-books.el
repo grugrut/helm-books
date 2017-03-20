@@ -1,7 +1,7 @@
-;;; helm-books.el --- Books searcher with helm interface
+;;; helm-books.el --- Helm interface for searching books
 ;; Author: grugrut <grugruglut+github@gmail.com>
 ;; URL: https://github.com/grugrut/helm-books
-;; Version: 0.5
+;; Version: 1.0
 ;; Package-Requires: ((helm "1.7.7"))
 
 ;; This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 ;;; Commentary:
 
-;; Books searcher with helm interface.
+;; Helm interface for searching books
 
 ;;; Code:
 
@@ -27,16 +27,17 @@
 (require 'json)
 
 (defgroup helm-books nil
-  "Books searcher with helm interface"
+  "Helm interface for searching books"
   :prefix "helm-books-"
   :group 'helm)
 
 (defcustom helm-books-custom-format "#title#\n:AUTHORS:#author#"
-  "."
+  "A format of helm-books--custom-format-action.
+#title#, #author#, #publisher#, #publishDate# are replaced imformation of the book."
   :group 'helm-books)
 
 (defun helm-books--url-retrieve-from-google ()
-  "."
+  "Retrieve information of book using google books api."
   (switch-to-buffer
    (url-retrieve-synchronously
     (concat "https://www.googleapis.com/books/v1/volumes?q=" helm-pattern)))
@@ -48,8 +49,9 @@
   (kill-buffer (current-buffer))
   (json-read-from-string (decode-coding-string response-string 'utf-8)))
 
-(defun helm-books--extract-values (item)
-  "."
+(defun helm-books--extract-values-from-google (item)
+  "Extract attribute from result of api.
+ITEM is each book information."
   (let ((title "")
         (author "")
         (publisher "")
@@ -70,14 +72,15 @@
 
 (defun helm-books--candidates-from-google ()
   "."
-  (mapcar 'helm-books--extract-values (cdr (nth 2 (helm-books--url-retrieve-from-google)))))
+  (mapcar 'helm-books--extract-values-from-google (cdr (nth 2 (helm-books--url-retrieve-from-google)))))
 
 (defun helm-books--candidates ()
   "."
   (funcall #'helm-books--candidates-from-google))
 
 (defun helm-books--custom-format-action (candidate)
-  "."
+  "Insert string using custom format.
+CANDIDATE is user selection."
   (let ((returnString helm-books-custom-format))
     (insert returnString)
     (string-match "Title:\\(.+?\\)," candidate)
@@ -87,7 +90,7 @@
     (string-match "Publisher:\\(.+?\\)," candidate)
     (setq returnString (replace-regexp-in-string "#publisher#" (match-string 1 candidate) returnString))
     (string-match "PublishDate:\\(.+?\\)," candidate)
-    (setq returnString (replace-regexp-in-string "#publishDate#" (match-string 1 candidate) returnString))
+    (setq returnString (replace-regexp-in-string "#publishedDate#" (match-string 1 candidate) returnString))
     (message returnString)
     ))
 
