@@ -34,6 +34,7 @@
 (defcustom helm-books-custom-format "#title#\n:AUTHORS:#author#"
   "A format of 'helm-books--custom-format-action'.
 #title#, #author#, #publisher#, #publishDate# are replaced imformation of the book."
+  :type 'string
   :group 'helm-books)
 
 (defun helm-books--url-retrieve-from-google ()
@@ -43,11 +44,10 @@
     (concat "https://www.googleapis.com/books/v1/volumes?q=" helm-pattern)))
   (goto-char (point-min))
   (re-search-forward "\n\n")
-  (setq response-string
-        (buffer-substring-no-properties
-         (point) (point-max)))
-  (kill-buffer (current-buffer))
-  (json-read-from-string (decode-coding-string response-string 'utf-8)))
+  (let ((response-string (buffer-substring-no-properties
+                          (point) (point-max))))
+    (kill-buffer (current-buffer))
+    (json-read-from-string (decode-coding-string response-string 'utf-8))))
 
 (defun helm-books--extract-values-from-google (item)
   "Extract attribute from result of api.
