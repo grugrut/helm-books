@@ -20,7 +20,7 @@ Copy helm-books.el to a directory in your `load-path`.
 
 ``` emacs-lisp
 (require 'helm-books)
-(setq helm-books-custom-format "Your preferred format.") ; Default is "#title#\n:AUTHORS:#author#"
+(setq helm-books-custom-format "Your preferred format.") ; Default is "#title#\n:PROPERTIES:\n:AUTHORS:#author#:END:"
 ```
 
 ## Command
