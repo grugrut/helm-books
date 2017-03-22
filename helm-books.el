@@ -82,7 +82,6 @@ ITEM is each book information."
   "Insert string using custom format.
 CANDIDATE is user selection."
   (let ((returnString helm-books-custom-format))
-    (insert returnString)
     (string-match "Title:\\(.+?\\)," candidate)
     (setq returnString (replace-regexp-in-string "#title#" (match-string 1 candidate) returnString))
     (string-match "Authors:\\(.+?\\)," candidate)
@@ -91,7 +90,8 @@ CANDIDATE is user selection."
     (setq returnString (replace-regexp-in-string "#publisher#" (match-string 1 candidate) returnString))
     (string-match "PublishDate:\\(.+?\\)," candidate)
     (setq returnString (replace-regexp-in-string "#publishedDate#" (match-string 1 candidate) returnString))
-    (message returnString)
+    (insert returnString)
+    returnString
     ))
 
 (defvar helm-books--source
