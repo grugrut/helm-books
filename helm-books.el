@@ -23,6 +23,9 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (defvar url-http-end-of-headers))
+
 (require 'helm)
 (require 'json)
 
@@ -42,10 +45,8 @@
   (switch-to-buffer
    (url-retrieve-synchronously
     (concat "https://www.googleapis.com/books/v1/volumes?q=" helm-pattern)))
-  (goto-char (point-min))
-  (re-search-forward "\n\n")
   (let ((response-string (buffer-substring-no-properties
-                          (point) (point-max))))
+                          url-http-end-of-headers (point-max))))
     (kill-buffer (current-buffer))
     (json-read-from-string (decode-coding-string response-string 'utf-8))))
 
