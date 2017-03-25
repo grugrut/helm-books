@@ -27,6 +27,7 @@
   (defvar url-http-end-of-headers))
 
 (require 'helm)
+(require 'helm-net)
 (require 'json)
 
 (defgroup helm-books nil
@@ -94,6 +95,11 @@ CANDIDATE is user selection."
     (insert returnString)
     returnString
     ))
+(defun helm-books--google-search-action (candidate)
+  "Google search the title of user selection.
+CANDIDATE is user selection."
+  (string-match "Title:\\(.+?\\)," candidate)
+  (helm-google-suggest-action (match-string 1 candidate)))
 
 (defvar helm-books--source
   (helm-build-sync-source  "Books"
@@ -102,7 +108,8 @@ CANDIDATE is user selection."
     :volatile t
     :action (helm-make-actions
              "Insert custom format" #'helm-books--custom-format-action
-             "Insert" #'insert)))
+             "Insert" #'insert
+             "Google Search" #'helm-books--google-search-action)))
 
 ;;;###autoload
 (defun helm-books ()
