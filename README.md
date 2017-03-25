@@ -1,3 +1,5 @@
+[![MELPA](https://melpa.org/packages/helm-books-badge.svg)](https://melpa.org/#/helm-books)
+
 # helm-books
 
 `helm-books.el` is a helm interface for searching books.
